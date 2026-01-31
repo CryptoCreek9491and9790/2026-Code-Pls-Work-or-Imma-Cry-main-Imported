@@ -55,4 +55,24 @@ public final class Configs {
                     .positionWrappingInputRange(0, turningFactor);
         }
     }
-}
+
+
+    public static final class IntakeSubsystem {
+        public static final SparkMaxConfig INTAKE_CONFIG = new SparkMaxConfig();
+        public static final SparkMaxConfig PIVOT_CONFIG = new SparkMaxConfig();
+
+        static{
+                INTAKE_CONFIG
+                .inverted(false)
+                .idleMode(IdleMode.kCoast)
+                .openLoopRampRate(.5)
+                .smartCurrentLimit(40);
+
+                PIVOT_CONFIG
+                .inverted(false)
+                .idleMode(IdleMode.kBrake)
+                .openLoopRampRate(.5)
+                .smartCurrentLimit(40);
+        }
+        }
+    }

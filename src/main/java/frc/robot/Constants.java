@@ -33,6 +33,19 @@ import edu.wpi.first.math.util.Units;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
+
+  public static final class IntakeSubsystemConstants {
+    public static final int kPivotMotorCanId = 2;
+    public static final int kIntakeMotorCanId = 4;
+
+    public static final class IntakeSetpoints {
+      public static final double kIntake = 0;
+      public static final double kExtake = 0;    } //Change values later
+
+    public static final class PivotSetpoints {
+      public static final double kIntake = 0;
+      public static final double kExtake = 0;    }  //Change values later
+  }
    public static class Vision {
 
     public static final Transform3d kRobotToCam =

@@ -28,6 +28,9 @@ import java.util.List;
 
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonUtils;
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.geometry.Translation2d;
 
 public class RobotContainer {
 /*
@@ -45,6 +48,9 @@ public class RobotContainer {
 
  //Camera for vision alignment
  private final PhotonCamera camera = new PhotonCamera("maincam");
+ 
+ // AprilTag field layout for getting tag poses
+ private final AprilTagFieldLayout fieldLayout = AprilTagFields.k2026RebuiltAndymark.loadAprilTagLayoutField();
 
  //Vision Alignment Constants
  private static final double VISION_TURN_kP = 0.1;
@@ -103,25 +109,23 @@ public XboxController getDriverController() {
         .whileTrue(new RunCommand(
             () -> drivetrain.setX(),
             drivetrain));
-  //A Button- Allign to Tag 10
+  //A Button- Allign to Tag 25
   new JoystickButton(driverController, XboxController.Button.kA.value)
     .whileTrue(new RunCommand(() -> {
       //Get Camera Data
       boolean targetVisible = false;
+      int targetId = 0;
       double targetYaw = 0;
       double targetRange = 0;
+      double targetPitch = 0;
 
       var results = camera.getLatestResult();
          if (results.hasTargets()) {
           for (var target : results.getTargets()) {
-            if (target.getFiducialId() == 10) {
+            if (target.getFiducialId() == 10 || target.getFiducialId() == 25) {
+              targetId = target.getFiducialId();
               targetYaw = target.getYaw();
-              targetRange = PhotonUtils.calculateDistanceToTargetMeters(
-                .5,
-                1.435,
-                Units.degreesToRadians(-30),
-                Units.degreesToRadians(target.getPitch())
-                );
+              targetPitch = target.getPitch();
               targetVisible = true;
               break;
             }
@@ -130,39 +134,109 @@ public XboxController getDriverController() {
 
     //Calculate Alignment Commands
     if (targetVisible) {
-      double turn = (VISION_DES_ANGLE_deg - targetYaw) * VISION_TURN_kP;
+      double turn = - targetYaw * VISION_TURN_kP;
+      turn = Math.max(-.5, Math.min(.5, turn)); //Limit to 50% Max turn speed
       
-      // Calculate distance control using proportional controller
-      double rangeError = targetRange - VISION_DES_RANGE_m;
-      double forward = 0.0;
+      //Distance Control
+      //Calculate Distance with vision
+      double currentDistance = PhotonUtils.calculateDistanceToTargetMeters(
+        .5,
+        1.435,
+        Math.toRadians(30),
+        Math.toRadians(targetPitch)
+        );
+      //Calculate Distance error
+      double distanceError = currentDistance - VISION_DES_RANGE_m;
       
-      // Apply deadband - stop moving forward/backward if within deadband
-      if (Math.abs(rangeError) > VISION_RANGE_DEADBAND_m) {
-        // When far (targetRange > desired), rangeError is positive, drive forward (positive)
-        forward = rangeError * VISION_STRAFE_kP;
+      double forwardSpeed = 0;
+
+      if (Math.abs(distanceError) > VISION_RANGE_DEADBAND_m) {
+        forwardSpeed = distanceError * VISION_STRAFE_kP;
+        forwardSpeed = Math.max(-.6, Math.min(.6, forwardSpeed));
+      }
+      
+      // Get tag pose from field layout
+      var tagPoseOptional = fieldLayout.getTagPose(targetId);
+      double xSpeed = 0.0;
+      double ySpeed = 0.0;
+      
+      if (tagPoseOptional.isPresent()) {
+        // Get robot's current pose
+        Pose2d robotPose = drivetrain.getPose();
+        
+        // Calculate direction vector from robot to tag (in field coordinates)
+        Translation2d robotToTag = tagPoseOptional.get().toPose2d().getTranslation()
+            .minus(robotPose.getTranslation());
+        
+        // Use field distance instead of vision distance for more accurate control
+        double fieldDistanceToTag = robotToTag.getNorm();
+        double rangeError = fieldDistanceToTag - VISION_DES_RANGE_m;
+        
+        // Apply deadband - stop moving forward/backward if within deadband
+        if (Math.abs(rangeError) > VISION_RANGE_DEADBAND_m) {
+          if (fieldDistanceToTag > 0.01) { // Avoid division by zero
+            // Normalize direction vector (points FROM robot TO tag)
+            Translation2d direction = robotToTag.div(fieldDistanceToTag);
+            
+            // Scale by range error and gain
+            // When far (fieldDistanceToTag > desired), rangeError is positive, drive toward tag
+            double speedMagnitude = rangeError * VISION_STRAFE_kP;
+            
+            // Convert to field-relative speeds
+            // Negate direction because field-relative drive may have different convention
+            xSpeed = direction.getX() * speedMagnitude;
+            ySpeed = -direction.getY() * speedMagnitude;
+          }
+        }
+      } else {
+        // Fallback to vision-based distance if tag pose not found
+        double rangeError = targetRange - VISION_DES_RANGE_m;
+        if (Math.abs(rangeError) > VISION_RANGE_DEADBAND_m) {
+          // Use simple forward/backward based on vision yaw
+          // When far, drive forward (positive) - but we need to know which way is forward
+          // For now, just use the range error directly
+          xSpeed = rangeError * VISION_STRAFE_kP;
+        }
       }
 
       //Clamp Values
       turn = Math.max(-1, Math.min(1, turn));
-      forward = Math.max(-1, Math.min(1, forward));
+      xSpeed = Math.max(-1, Math.min(1, xSpeed));
+      ySpeed = Math.max(-1, Math.min(1, ySpeed));
 
-      //Drive Toward Tag
-      drivetrain.drive(forward, 0, turn, true);
+      //Drive Toward Tag (field-relative, so it works from any direction)
+      drivetrain.drive(xSpeed, ySpeed, turn, true);
        // Debug output
                 SmartDashboard.putBoolean("Vision Target Visible", true);
+                SmartDashboard.putBoolean("Vision Align Active", true);
+                SmartDashboard.putNumber("Target ID", targetId);
                 SmartDashboard.putNumber("Target Yaw", targetYaw);
-                SmartDashboard.putNumber("Target Range", targetRange);
-                SmartDashboard.putNumber("Range Error", targetRange - VISION_DES_RANGE_m);
-                SmartDashboard.putNumber("Align Forward", forward);
+                SmartDashboard.putNumber("Target Range (Vision)", targetRange);
+                if (tagPoseOptional.isPresent()) {
+                  Pose2d robotPose = drivetrain.getPose();
+                  double fieldDist = tagPoseOptional.get().toPose2d().getTranslation()
+                      .minus(robotPose.getTranslation()).getNorm();
+                  SmartDashboard.putNumber("Field Distance", fieldDist);
+                  SmartDashboard.putNumber("Range Error", fieldDist - VISION_DES_RANGE_m);
+                }
+                SmartDashboard.putNumber("Align X Speed", xSpeed);
+                SmartDashboard.putNumber("Align Y Speed", ySpeed);
                 SmartDashboard.putNumber("Align Turn", turn);
               } else {
                 // No target, stop and reset PID controller
                 rangeController.reset();
                 drivetrain.drive(0, 0, 0, false);
                 SmartDashboard.putBoolean("Vision Target Visible", false);
+                SmartDashboard.putBoolean("Vision Align Active", false);
               }
             },
-            drivetrain));
+            drivetrain)
+        .finallyDo((interrupted) -> {
+          // Ensure drivetrain stops when command ends (button released)
+          drivetrain.drive(0, 0, 0, false);
+          rangeController.reset();
+          SmartDashboard.putBoolean("Vision Align Active", false);
+        }));
     }
 
   
