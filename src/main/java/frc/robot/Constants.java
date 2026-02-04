@@ -35,7 +35,7 @@ import edu.wpi.first.math.util.Units;
 public final class Constants {
 
   public static final class IntakeSubsystemConstants {
-    public static final int kPivotMotorCanId = 2;
+    public static final int kPivotMotorCanId = 3;
     public static final int kIntakeMotorCanId = 4;
 
     public static final class IntakeSetpoints {
@@ -48,6 +48,7 @@ public final class Constants {
   }
    public static class Vision {
 
+    public static final String kCameraName = "maincam";
     public static final Transform3d kRobotToCam =
       new Transform3d(
         new Translation3d(0.2, 0, .5),

@@ -36,7 +36,6 @@ public class Robot extends TimedRobot {
   private DriveSubsystem drivetrain;
 
   //PhotonVision Simulation
-  private VisionSystemSim visionsim;
   private PhotonCameraSim camerasim;
 
 
@@ -54,23 +53,8 @@ public class Robot extends TimedRobot {
     drivetrain = m_robotContainer.getDrivetrain(); // <-- Get the drivetrain
 
     vision = new Vision(drivetrain::addVisionMeasurement); // <-- Create vision subsystem
-//Initialize Photonvision simulation
-    if (isSimulation()) {
-      //Create vision system simulator 
-      visionsim = new VisionSystemSim("main");
-      PhotonCamera camera = vision.getCamera();
-      //Create camera simulator
-      camerasim = new PhotonCameraSim(camera);
-      //Add camera to vision system with its transform from robot center
-      visionsim.addCamera(camerasim, Constants.Vision.kRobotToCam);
-      //Add apriltag field layout to sim
-      visionsim.addAprilTags(Constants.Vision.kTagLayout);
-      //Enable wireframe visualization
-      camerasim.enableDrawWireframe(true);
-
-
-    }
   }
+  
 
   /**
    * This function is called every 20 ms, no matter the mode. Use this for items like diagnostics
@@ -92,13 +76,6 @@ public class Robot extends TimedRobot {
 
   }
 
-@Override
-public void simulationPeriodic() {
-  //Update vision simulation with current robot pose
-  if (visionsim !=null) {
-    visionsim.update(drivetrain.getPose());
-  }
-}
 
   
   /** This function is called once each time the robot enters Disabled mode. */
@@ -155,10 +132,6 @@ public void simulationPeriodic() {
         drivetrain.resetOdometry(startPose);
         //visionSim.resetSimPose(startPose);
 
-        //Also reset vision sim pose if in simulation
-        if (isSimulation() && visionsim !=null) {
-          visionsim.resetRobotPose(startPose);
-        }
   }
 }
 

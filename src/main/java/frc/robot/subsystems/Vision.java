@@ -9,11 +9,19 @@ import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
+import org.photonvision.estimation.VisionEstimation;
+import org.photonvision.simulation.PhotonCameraSim;
+import org.photonvision.simulation.SimCameraProperties;
+import org.photonvision.simulation.VisionSystemSim;
+
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Robot;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 
@@ -23,6 +31,8 @@ public class Vision extends SubsystemBase {
   private final PhotonCamera camera;
   private final PhotonPoseEstimator photonEstimator;
   private final AprilTagFieldLayout aprilTagFieldLayout;
+  private PhotonCameraSim cameraSim;
+  private VisionSystemSim visionSim;
 
   //Callback to send pose estimates to the drivetrain
   private final BiConsumer<Pose2d, Double> poseConsumer;
@@ -32,18 +42,29 @@ public class Vision extends SubsystemBase {
    *  @param poseConsumer A method reference to add vision measurements (e.g., drivetrain::addVisionMeasurement)
    */
   public Vision (BiConsumer<Pose2d, Double> poseConsumer) {
-    this.camera = new PhotonCamera("maincam");
-    this.poseConsumer = poseConsumer;
+   aprilTagFieldLayout = AprilTagFields.k2026RebuiltAndymark.loadAprilTagLayoutField();
+  camera = new PhotonCamera("maincam");
+  this.poseConsumer = poseConsumer;
+  photonEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, Constants.Vision.kRobotToCam);
 
-    //Load the AprilTag Field Layout for 2026
-    this.aprilTagFieldLayout = AprilTagFields.k2026RebuiltAndymark.loadAprilTagLayoutField();
+    // Sim
+    if (Robot.isSimulation()) {
+      //Create the vision simulation
+      visionSim = new VisionSystemSim("main");
+      //Add all the apriltags inside the tag layout as visible targets
+      visionSim.addAprilTags(aprilTagFieldLayout);
+      //Create properties for sim cam
+      var cameraProp = new SimCameraProperties();
+      cameraProp.setCalibration(960, 720, Rotation2d.fromDegrees(90));
+      cameraProp.setCalibError(.35, .10);
+      cameraProp.setFPS(60);
+      cameraProp.setAvgLatencyMs(50);
+      cameraProp.setLatencyStdDevMs(15);
+      cameraSim = new PhotonCameraSim(camera, cameraProp);
+      visionSim.addCamera(cameraSim, Constants.Vision.kRobotToCam);
+      cameraSim.enableDrawWireframe(true);
 
-    //Create the PhotonPoseEstimator
-    this.photonEstimator = new PhotonPoseEstimator(
-      aprilTagFieldLayout,
-      PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
-       Constants.Vision.kRobotToCam);
-
+    }
       //Set the fallback pose strategy for single tag detections
       photonEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
   }
@@ -63,6 +84,9 @@ public class Vision extends SubsystemBase {
       SmartDashboard.putNumber("Best Target ID", result.getBestTarget().getFiducialId());
     }
   
+    if (Robot.isSimulation()) {
+      
+    }
     //Try to get an estimated robot pose
   Optional<EstimatedRobotPose> estimatedPose = getEstimatedGlobalPose();
 
@@ -129,5 +153,12 @@ public class Vision extends SubsystemBase {
   //Gets the PhotonCamera instance
   public PhotonCamera getCamera() {
     return camera;
+  }
+  public void simulationPeriodic(Pose2d robotSimPose) {
+    visionSim.update(robotSimPose);
+  }
+
+  public void resetSimPose(Pose2d pose) {
+    if (Robot.isSimulation()) visionSim.resetRobotPose(pose);
   }
 }
