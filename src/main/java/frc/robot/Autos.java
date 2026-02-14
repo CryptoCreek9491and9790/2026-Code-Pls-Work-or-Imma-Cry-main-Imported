@@ -7,8 +7,10 @@ import frc.robot.subsystems.DriveSubsystem;
 
 public class Autos {
     private final AutoFactory factory;
+    private final DriveSubsystem drivetrain;
     
     public Autos (DriveSubsystem swerve) {
+        this.drivetrain = swerve;
         factory = new AutoFactory(
             swerve::getPose,
             swerve:: resetOdometry,
@@ -21,11 +23,15 @@ public class Autos {
 
 public Command newPath() {
     final var routine = factory.newRoutine("test 2");
-    final var traj = routine.trajectory("NewPath");
+    final var traj1 = routine.trajectory("Path1");
+    final var traj2 = routine.trajectory("Path2");
 
     routine.active().whileTrue(Commands.sequence(
-        traj.resetOdometry(),
-        traj.cmd()
+        traj1.resetOdometry(),
+        traj1.cmd(),
+        Commands.runOnce(()-> drivetrain.drive(0, 0, 0, false), drivetrain)
+            .andThen(Commands.waitSeconds(3)),
+        traj2.cmd()
         )
         );
 

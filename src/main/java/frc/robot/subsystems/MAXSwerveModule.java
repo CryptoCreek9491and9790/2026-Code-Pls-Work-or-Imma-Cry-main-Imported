@@ -97,7 +97,7 @@ if (!RobotBase.isSimulation()) {
     m_simDriveVelocity = m_drivingSparkSim.getVelocity();
     
     // Update drive position by integrating velocity
-    m_simDrivePosition += m_simDriveVelocity * 0.08;
+    m_simDrivePosition += m_simDriveVelocity * 0.16;
 
     // CRITICAL FIX: Simulate turning motor
     m_turningSparkSim.iterate(m_turningSpark.getAppliedOutput(), 12.0, 0.02);

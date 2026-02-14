@@ -350,14 +350,18 @@ public class DriveSubsystem extends SubsystemBase {
       sample.omega + headingController.calculate(pose.getRotation().getRadians(), sample.heading)
     );
 
-    var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(
-      ChassisSpeeds.fromFieldRelativeSpeeds(speeds, pose.getRotation()));
+    var chassisField = ChassisSpeeds.fromFieldRelativeSpeeds(speeds, pose.getRotation());
+    m_lastChassisSpeeds = chassisField;
+
+    var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(chassisField);
       SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
 
     m_frontRight.setDesiredState(swerveModuleStates[1]);
     m_frontLeft.setDesiredState(swerveModuleStates[0]);
     m_rearLeft.setDesiredState(swerveModuleStates[2]);
     m_rearRight.setDesiredState(swerveModuleStates[3]);
+
+    SmartDashboard.putNumber("Choreo/TargetOmegaRadPerSec", sample.omega);
   }
 
   /**
@@ -373,4 +377,6 @@ public class DriveSubsystem extends SubsystemBase {
   public double getTurnRate() {
     return m_gyro.getRate() * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
   }
+
+  //Convert 
 }
