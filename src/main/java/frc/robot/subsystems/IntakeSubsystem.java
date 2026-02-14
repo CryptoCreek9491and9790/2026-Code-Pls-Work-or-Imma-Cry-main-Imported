@@ -15,12 +15,12 @@ import frc.robot.Constants.IntakeSubsystemConstants.IntakeSetpoints;
 
 public class IntakeSubsystem extends SubsystemBase {
     //Initialize intake SPARK. We will use open loop control for this
-    private SparkMax IntakeMotor =
+    private final SparkMax IntakeMotor =
     new SparkMax(IntakeSubsystemConstants.kIntakeMotorCanId, MotorType.kBrushless);
     
     //Initialize intake SPARK. We will use open loop control for this
-    private SparkMax PivotMotor =
-        new SparkMax(IntakeSubsystemConstants.kIntakeMotorCanId, MotorType.kBrushless);
+    private final SparkMax PivotMotor =
+        new SparkMax(IntakeSubsystemConstants.kPivotMotorCanId, MotorType.kBrushless);
 
     public IntakeSubsystem() {
 
@@ -49,24 +49,22 @@ public class IntakeSubsystem extends SubsystemBase {
 
     //Command to run the intake and pivot motors. When the command is interrupted,
     // ex is if the button is released, the motors will stop
-    public Command runIntakeCommand() {
+
+
+    public Command runDownCommand() {
         return this.startEnd(()-> {
-        this.setIntakePower(IntakeSetpoints.kIntake);
-        this.setPivotPower(PivotSetpoints.kIntake); },
+        this.setPivotPower(PivotSetpoints.kDown); },
         () -> {
-            this.setIntakePower(0);
-            this.setPivotPower(0);
-            }).withName("Intaking");
+            this.setPivotPower(.1);
+            }).withName("Going Down");
         }
 
     //Command to reverse the intake motor and pivot motor. When the command is interrupted, 
     //ex the buttons is released, the motors will stop.
-    public Command runExtakeCommand() {
+    public Command runUpCommand() {
         return this.startEnd( () -> {
-        this.setIntakePower(IntakeSetpoints.kExtake);
-        this.setPivotPower(PivotSetpoints.kExtake); },
+        this.setPivotPower(PivotSetpoints.kUp); },
         () -> {
-            this.setIntakePower(0);
-            this.setPivotPower(0);
-        }).withName("Extaking");
+            this.setPivotPower(.1);
+        }).withName("Going Up");
     }}

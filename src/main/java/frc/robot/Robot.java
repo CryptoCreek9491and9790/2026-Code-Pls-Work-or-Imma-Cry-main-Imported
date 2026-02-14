@@ -4,19 +4,15 @@
 
 package frc.robot;
 
-import org.photonvision.PhotonCamera;
 import org.photonvision.simulation.PhotonCameraSim;
-import org.photonvision.simulation.VisionSystemSim;
+
+import com.revrobotics.spark.SparkMax;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.Vision;
 
@@ -37,8 +33,7 @@ public class Robot extends TimedRobot {
 
   //PhotonVision Simulation
   private PhotonCameraSim camerasim;
-
-
+  private RobotContainer driverController;
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -53,6 +48,7 @@ public class Robot extends TimedRobot {
     drivetrain = m_robotContainer.getDrivetrain(); // <-- Get the drivetrain
 
     vision = new Vision(drivetrain::addVisionMeasurement); // <-- Create vision subsystem
+
   }
   
 

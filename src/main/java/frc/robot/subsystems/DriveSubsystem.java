@@ -9,8 +9,10 @@ import edu.wpi.first.hal.FRCNetComm.tResourceType;
 
 import com.studica.frc.AHRS;
 
+import choreo.trajectory.SwerveSample;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -55,9 +57,17 @@ public class DriveSubsystem extends SubsystemBase {
   private double m_simGyroAngle = 0.0; //Sim gyro angle
   private ChassisSpeeds m_lastChassisSpeeds = new ChassisSpeeds(); //Track last commanded speeds
 
+  //PID for Auto
+  private final PIDController xController = new PIDController(10.0, 0.0, 0.0);
+  private final PIDController yController = new PIDController(10.0, 0, 0);
+  private final PIDController headingController = new PIDController(7.5, 0, 0);
+
   /** Creates a new DriveSubsystem. */
   
   public DriveSubsystem() {
+
+    //Heading for Auto
+    headingController.enableContinuousInput(-Math.PI, Math.PI);
     // Usage reporting for MAXSwerve template
     HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDriveSwerve_MaxSwerve);
    // Define the standard deviations for the pose estimator, which determine how fast the pose
@@ -192,6 +202,7 @@ public class DriveSubsystem extends SubsystemBase {
     return poseEstimator.getEstimatedPosition();
   }
 
+
   /**
    * Resets the odometry to the specified pose.
    *
@@ -321,6 +332,32 @@ public class DriveSubsystem extends SubsystemBase {
       m_simGyroAngle = 0;
     } else {
     m_gyro.reset();}
+  }
+
+  public void followTrajectory(SwerveSample sample) {
+    //Logging pose for Advantage Scope
+    SmartDashboard.putNumberArray("Choreo Target Pose", new double[] {
+      sample.x,
+      sample.y,
+      sample.heading
+    });
+
+    Pose2d pose = getPose();
+
+    ChassisSpeeds speeds = new ChassisSpeeds(
+      sample.vx + xController.calculate(pose.getX(), sample.x),
+      sample.vy +yController.calculate(pose.getY(), sample.y),
+      sample.omega + headingController.calculate(pose.getRotation().getRadians(), sample.heading)
+    );
+
+    var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(
+      ChassisSpeeds.fromFieldRelativeSpeeds(speeds, pose.getRotation()));
+      SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
+
+    m_frontRight.setDesiredState(swerveModuleStates[1]);
+    m_frontLeft.setDesiredState(swerveModuleStates[0]);
+    m_rearLeft.setDesiredState(swerveModuleStates[2]);
+    m_rearRight.setDesiredState(swerveModuleStates[3]);
   }
 
   /**

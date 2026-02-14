@@ -4,7 +4,6 @@
 
 package frc.robot;
 
-import org.photonvision.PhotonCamera;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
@@ -39,12 +38,12 @@ public final class Constants {
     public static final int kIntakeMotorCanId = 4;
 
     public static final class IntakeSetpoints {
-      public static final double kIntake = 0;
-      public static final double kExtake = 0;    } //Change values later
+      public static final double kIntake = 1;
+      public static final double kExtake = -1;    } //Change values later
 
     public static final class PivotSetpoints {
-      public static final double kIntake = 0;
-      public static final double kExtake = 0;    }  //Change values later
+      public static final double kUp = -.15;
+      public static final double kDown = .15;    }  //Change values later
   }
    public static class Vision {
 
