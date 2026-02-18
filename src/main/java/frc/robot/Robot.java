@@ -66,9 +66,7 @@ public class Robot extends TimedRobot {
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
-    drivetrain.periodic();
-    vision.periodic();
-    drivetrain.log();
+        drivetrain.log();
 
   }
 
@@ -107,7 +105,11 @@ public class Robot extends TimedRobot {
   public void autonomousPeriodic() {}
 
   @Override
-  public void teleopInit(){}
+  public void teleopInit(){
+    if (m_autonomousCommand !=null) {
+      m_autonomousCommand.cancel();
+    }
+  }
 
   @Override
   public void testInit() {

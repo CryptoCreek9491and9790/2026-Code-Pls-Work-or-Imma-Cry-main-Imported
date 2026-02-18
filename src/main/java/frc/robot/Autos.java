@@ -26,14 +26,15 @@ public Command newPath() {
     final var traj1 = routine.trajectory("Path1");
     final var traj2 = routine.trajectory("Path2");
 
-    routine.active().whileTrue(Commands.sequence(
+    return Commands.sequence(
+        Commands.runOnce(routine::poll),
         traj1.resetOdometry(),
         traj1.cmd(),
-        Commands.runOnce(()-> drivetrain.drive(0, 0, 0, false), drivetrain)
-            .andThen(Commands.waitSeconds(3)),
-        traj2.cmd()
+        Commands.runOnce(()-> drivetrain.drive(0, 0, 0, false), drivetrain),
+        Commands.waitSeconds(3),
+        traj2.cmd(),
+        Commands.runOnce(() -> drivetrain.drive(0, 0, 0, false), drivetrain)
         )
-        );
-
-        return routine.cmd();}
+        ;
+    }
 }

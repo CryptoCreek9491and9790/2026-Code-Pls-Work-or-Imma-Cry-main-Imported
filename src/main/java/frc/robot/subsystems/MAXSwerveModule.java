@@ -33,8 +33,8 @@ public class MAXSwerveModule {
   private double m_simTurnVelocity = 0;
 
   private static final double kDriveSimP = 10.0;
-  private static final double kTurnSimP = 20.0;
-  private static final double kSimUpdatePeriod = .02;
+  private static final double kTurnSimP = 30.0;
+  private static final double kSimUpdatePeriod = .01;
 
   private final RelativeEncoder m_drivingEncoder;
   private final AbsoluteEncoder m_turningEncoder;
