@@ -8,10 +8,12 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.OIConstants;
+import frc.robot.Util.FuelSim;
 import frc.robot.subsystems.DriveSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -23,6 +25,7 @@ import org.photonvision.PhotonUtils;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 
+
 public class RobotContainer {
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -31,6 +34,8 @@ public class RobotContainer {
  * (including subsystems, commands, and button mappings) should be declared here.
  */
 
+  //Dashboard Input
+  public FuelSim fuelsim;
   // The robot's subsystems
   private final DriveSubsystem drivetrain = new DriveSubsystem();
   private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
@@ -90,10 +95,14 @@ public XboxController getDriverController() {
             }, drivetrain));
       autoChooser.setDefaultOption("test 2", autos.newPath());
     SmartDashboard.putData("autoChooser", autoChooser);
-    }
-            
-  
 
+    if (RobotBase.isSimulation()) {
+      configureFuelSim();}}
+    
+  
+            
+  private void configureFuelSim(){
+  }
   /**
    * Use this method to define your button->command mappings. Buttons can be
    * created by

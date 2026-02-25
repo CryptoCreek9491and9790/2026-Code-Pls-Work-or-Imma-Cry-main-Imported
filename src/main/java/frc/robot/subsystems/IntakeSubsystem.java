@@ -52,11 +52,16 @@ public class IntakeSubsystem extends SubsystemBase {
 
 
     public Command runDownCommand() {
-        return this.startEnd(()-> {
-        this.setPivotPower(PivotSetpoints.kDown); },
+        return this.startEnd(
+        () -> {
+            this.setPivotPower(PivotSetpoints.kDown);
+            this.setIntakePower(IntakeSetpoints.kIntake);
+        },
         () -> {
             this.setPivotPower(.1);
-            }).withName("Going Down");
+            this.setIntakePower(0);
+        }
+        ).withName("IntakeDownandRun");
         }
 
     //Command to reverse the intake motor and pivot motor. When the command is interrupted, 

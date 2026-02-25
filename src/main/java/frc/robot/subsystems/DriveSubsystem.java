@@ -58,8 +58,8 @@ public class DriveSubsystem extends SubsystemBase {
   private ChassisSpeeds m_lastChassisSpeeds = new ChassisSpeeds(); //Track last commanded speeds
 
   //PID for Auto
-  private final PIDController xController = new PIDController(10.0, 0.0, 0.0);
-  private final PIDController yController = new PIDController(10.0, 0, 0);
+  private final PIDController xController = new PIDController(8.0, 0.0, 0.0);
+  private final PIDController yController = new PIDController(8.0, 0, 0);
   private final PIDController headingController = new PIDController(7.5, 0, 0);
 
   /** Creates a new DriveSubsystem. */
@@ -121,7 +121,7 @@ public class DriveSubsystem extends SubsystemBase {
     m_rearRight.simulationPeriodic();
 
     double omegaRadPerSec = m_lastChassisSpeeds.omegaRadiansPerSecond;
-    double gyroScale = .007;
+    double gyroScale = .14;
     
     m_simGyroAngle += Math.toDegrees(omegaRadPerSec * gyroScale) * .2;
 

@@ -11,6 +11,8 @@ import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.DriveSubsystem;
@@ -34,6 +36,13 @@ public class Robot extends TimedRobot {
   //PhotonVision Simulation
   private PhotonCameraSim camerasim;
   private RobotContainer driverController;
+
+  Pose2d[] gamePieces = new Pose2d[] {
+    new Pose2d(4.0, 3.0, new Rotation2d()),
+    new Pose2d(5.0, 5.0, new Rotation2d())
+  };
+
+  Field2d field = new Field2d();
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -70,7 +79,9 @@ public class Robot extends TimedRobot {
 
   }
 
-
+  @Override
+  public void simulationPeriodic() {
+  }
   
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
