@@ -7,6 +7,9 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import frc.robot.Constants.ModuleConstants;
 
 public final class Configs {
+
+
+        
     public static final class MAXSwerveModule {
         public static final SparkMaxConfig drivingConfig = new SparkMaxConfig();
         public static final SparkMaxConfig turningConfig = new SparkMaxConfig();
@@ -67,11 +70,52 @@ public final class Configs {
                 .openLoopRampRate(.5)
                 .smartCurrentLimit(40);
 
+                double pivotDegreesPerRotation = 360;
+
                 PIVOT_CONFIG
                 .inverted(false)
                 .idleMode(IdleMode.kBrake)
-                .openLoopRampRate(.5)
                 .smartCurrentLimit(40);
+                PIVOT_CONFIG.absoluteEncoder
+                .positionConversionFactor(pivotDegreesPerRotation)
+                .velocityConversionFactor(pivotDegreesPerRotation / 60);
+                PIVOT_CONFIG.closedLoop
+                .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
+                //Make sure to tune PID gains- start with a small P value liek .01
+                // and increase until it reaches the setpoint without oscillation 
+                .pid(.01, 0, 0)
+                .outputRange(-.4, .4) //Limits max power for safety while tuning
+                .positionWrappingEnabled(false);
         }
         }
-    }
+        public static final class ShooterSubsystem {
+                public static final SparkMaxConfig SHOOTER_CONFIG = new SparkMaxConfig();
+                public static final SparkMaxConfig HOOD_CONFIG = new SparkMaxConfig();
+
+                static {
+                        SHOOTER_CONFIG
+                        .inverted(false)
+                        .idleMode(IdleMode.kCoast)
+                        .openLoopRampRate(.5)
+                        .smartCurrentLimit(40);
+
+                        double hoodDegreesPerRotation = 360;
+
+                        HOOD_CONFIG
+                        .inverted(false)
+                        .idleMode(IdleMode.kBrake)
+                        .smartCurrentLimit(40);
+                       
+                        HOOD_CONFIG.absoluteEncoder
+                        .positionConversionFactor(hoodDegreesPerRotation)
+                        .velocityConversionFactor( hoodDegreesPerRotation/ 60);     
+                        HOOD_CONFIG.closedLoop
+                        .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
+                    // TODO: tune PID gains - start with a small P value like 0.01
+                    // and increase until it reaches the setpoint without oscillating
+                    .pid(0.01, 0.0, 0.0)
+                    .outputRange(-0.3, 0.3)  // Limit max power for safety while tuning
+                    .positionWrappingEnabled(false); // Hood likely has hard stops, so no wrapping
+                  }
+                }
+        }

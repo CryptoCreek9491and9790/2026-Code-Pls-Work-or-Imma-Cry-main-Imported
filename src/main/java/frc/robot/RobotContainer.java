@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Configs.ShooterSubsystem;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Util.FuelSim;
 import frc.robot.subsystems.DriveSubsystem;
@@ -39,6 +40,7 @@ public class RobotContainer {
   // The robot's subsystems
   private final DriveSubsystem drivetrain = new DriveSubsystem();
   private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
+  private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
 
   // The driver's controller
  private final XboxController driverController = new XboxController(0);
@@ -74,7 +76,9 @@ public XboxController getDriverController() {
    */
   public RobotContainer() {
     // Configure the button bindings
-    configureButtonBindings();
+    configureButtonBindings(
+  
+    );
     
     // Configure default commands
     drivetrain.setDefaultCommand(

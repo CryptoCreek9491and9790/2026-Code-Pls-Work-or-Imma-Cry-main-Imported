@@ -1,7 +1,10 @@
 package frc.robot.subsystems;
 
+import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
+import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
@@ -21,6 +24,8 @@ public class IntakeSubsystem extends SubsystemBase {
     //Initialize intake SPARK. We will use open loop control for this
     private final SparkMax PivotMotor =
         new SparkMax(IntakeSubsystemConstants.kPivotMotorCanId, MotorType.kBrushless);
+    private final SparkClosedLoopController pivotController = PivotMotor.getClosedLoopController();
+    private final AbsoluteEncoder pivotEncoder = PivotMotor.getAbsoluteEncoder();
 
     public IntakeSubsystem() {
 
@@ -43,8 +48,16 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     //Set the intake pivot power in the range of [-1,1]
-    private void setPivotPower(double power) {
-        PivotMotor.set(power);
+    private void setPivotAngle(double degrees) {
+        pivotController.setSetpoint(degrees, ControlType.kPosition);
+    }
+
+    public double getPivotAngle() {
+        return pivotEncoder.getPosition();
+    }
+
+    public boolean pivotAtSetpoint( double targetDegrees) {
+        return Math.abs(getPivotAngle() - targetDegrees) < IntakeSubsystemConstants.kPivotToleranceDegrees;
     }
 
     //Command to run the intake and pivot motors. When the command is interrupted,
@@ -54,22 +67,29 @@ public class IntakeSubsystem extends SubsystemBase {
     public Command runDownCommand() {
         return this.startEnd(
         () -> {
-            this.setPivotPower(PivotSetpoints.kDown);
-            this.setIntakePower(IntakeSetpoints.kIntake);
+            setPivotAngle(PivotSetpoints.kDown);
+            setIntakePower(IntakeSetpoints.kIntake);
         },
         () -> {
-            this.setPivotPower(.1);
-            this.setIntakePower(0);
+            setPivotAngle(PivotSetpoints.kUp);
+            setIntakePower(0);
         }
         ).withName("IntakeDownandRun");
         }
 
-    //Command to reverse the intake motor and pivot motor. When the command is interrupted, 
-    //ex the buttons is released, the motors will stop.
+    //Stows the intake: moves pivot up. Intake rollers stay off.
+    // Holds the up position until interrupted.
     public Command runUpCommand() {
-        return this.startEnd( () -> {
-        this.setPivotPower(PivotSetpoints.kUp); },
-        () -> {
-            this.setPivotPower(.1);
-        }).withName("Going Up");
-    }}
+        return this.runOnce( () -> 
+        setPivotAngle(PivotSetpoints.kUp))
+        .withName("PivotUp");
+    }
+
+    //Reverses the intake roller to eject balls
+    //Pivot stays where it is
+    public Command ejectCommand() {
+        return this.startEnd(() -> setIntakePower(IntakeSetpoints.kExtake),
+         () -> setIntakePower(0)
+        ).withName("Eject");
+    }
+}

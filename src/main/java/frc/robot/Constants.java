@@ -33,17 +33,38 @@ import edu.wpi.first.math.util.Units;
  */
 public final class Constants {
 
+  public static final class ShooterSubsystemConstants {
+    public static final int kShooterMotorCanId = 18;
+    public static final int KHoodMotorCanId = 19;
+
+    public static final double kShooterSpeed = .5;
+
+    public static final class ShooterSetpoints {
+      public static final double kShoot = .6;
+      public static final double kidle = 0;
+    }
+    public static final class HoodSetpoints {
+      public static final double kClose = 30; //Change All these later
+      public static final double kFar = 60; //Way less please change later
+      public static final double kStow = 10; //Resting change
+    }
+
+    public static final double kHoodToleranceDegrees = 1;
+  }
   public static final class IntakeSubsystemConstants {
     public static final int kPivotMotorCanId = 3;
     public static final int kIntakeMotorCanId = 4;
 
     public static final class IntakeSetpoints {
-      public static final double kIntake = 1;
-      public static final double kExtake = -1;    } //Change values later
+      public static final double kIntake = .5;
+      public static final double kExtake = -.5;    } //Change values later
 
     public static final class PivotSetpoints {
-      public static final double kUp = -.15;
-      public static final double kDown = .15;    }  //Change values later
+      public static final double kUp = 90; //Tune Arm STOWED
+      public static final double kDown = 20; //Tune Arm Deployed
+    } 
+
+    public static final double kPivotToleranceDegrees = 2;
   }
    public static class Vision {
 
