@@ -56,8 +56,6 @@ public class Robot extends TimedRobot {
     
     drivetrain = m_robotContainer.getDrivetrain(); // <-- Get the drivetrain
 
-    vision = new Vision(drivetrain::addVisionMeasurement); // <-- Create vision subsystem
-
   }
   
 
@@ -81,6 +79,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void simulationPeriodic() {
+    m_robotContainer.getVision().simulationPeriodic(drivetrain.getPose());
   }
   
   /** This function is called once each time the robot enters Disabled mode. */

@@ -42,7 +42,7 @@ public class Vision extends SubsystemBase {
    aprilTagFieldLayout = AprilTagFields.k2026RebuiltAndymark.loadAprilTagLayoutField();
   camera = new PhotonCamera("maincam");
   this.poseConsumer = poseConsumer;
-  photonEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, Constants.Vision.kRobotToCam);
+  photonEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, Constants.Vision.kRobotToCam);
 
     // Sim
     if (Robot.isSimulation()) {

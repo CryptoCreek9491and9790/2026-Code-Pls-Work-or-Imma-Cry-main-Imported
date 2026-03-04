@@ -51,20 +51,33 @@ public final class Constants {
 
     public static final double kHoodToleranceDegrees = 1;
   }
+
+  public static final class HopperSubsystemConstants{
+    public static final int krollerMotorCanId = 20;
+    public static final int kindexerMotorCandId = 21;
+
+    public static final class RollerSetpoints{
+      public static final double kRoll = .1;
+    }
+
+    public static final class IndexerSetpoints{
+      public static final double kIndex = -.5;
+    }
+  }
   public static final class IntakeSubsystemConstants {
     public static final int kPivotMotorCanId = 3;
     public static final int kIntakeMotorCanId = 4;
 
     public static final class IntakeSetpoints {
-      public static final double kIntake = .5;
-      public static final double kExtake = -.5;    } //Change values later
+      public static final double kExtake = .25;
+      public static final double kIntake = -.25;    } //Change values later
 
     public static final class PivotSetpoints {
-      public static final double kUp = 90; //Tune Arm STOWED
-      public static final double kDown = 20; //Tune Arm Deployed
+      public static final double kUp = 1; //Tune Arm STOWED
+      public static final double kDown = 160; //Tune Arm Deployed
     } 
 
-    public static final double kPivotToleranceDegrees = 2;
+    public static final double kPivotToleranceDegrees = .01;
   }
    public static class Vision {
 
@@ -119,6 +132,10 @@ public final class Constants {
     public static final int kRearRightTurningCanId = 16;
 
     public static final boolean kGyroReversed = false;
+  }
+  public static final class UtilityConstants {
+    public static final double kVortexFreeSpeedRpm = 6784;
+    public static final double kVortexFreeSpeedRps = kVortexFreeSpeedRpm/60;
   }
 
   public static final class ModuleConstants {

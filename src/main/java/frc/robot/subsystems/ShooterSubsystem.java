@@ -45,9 +45,6 @@ public class ShooterSubsystem extends SubsystemBase {
         ShooterMotor.set(power);
     }
 
-    private void SetHoodPower(double degrees) {
-        HoodController.setSetpoint(degrees, ControlType.kPosition);
-    }
 
     public double getHoodAngle() {
         return HoodEncoder.getPosition();

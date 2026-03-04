@@ -121,9 +121,8 @@ public class DriveSubsystem extends SubsystemBase {
     m_rearRight.simulationPeriodic();
 
     double omegaRadPerSec = m_lastChassisSpeeds.omegaRadiansPerSecond;
-    double gyroScale = .14;
     
-    m_simGyroAngle += Math.toDegrees(omegaRadPerSec * gyroScale) * .2;
+    m_simGyroAngle += Math.toDegrees(omegaRadPerSec * .02);
 
     while (m_simGyroAngle > 180) m_simGyroAngle -= 360;
     while (m_simGyroAngle < -180) m_simGyroAngle += 360;
@@ -252,11 +251,8 @@ public class DriveSubsystem extends SubsystemBase {
     double ySpeedDelivered = ySpeed * DriveConstants.kMaxSpeedMetersPerSecond;
     // Significantly increase turning speed in simulation for better responsiveness
     // Apply multiplier to the input before scaling to max speed
-    double rotInput = rot;
-    if (RobotBase.isSimulation()) {
-      rotInput = rot * 10.0; // 10x multiplier for simulation
-    }
-    double rotDelivered = rotInput * DriveConstants.kMaxAngularSpeed;
+    double rotDelivered = rot * DriveConstants.kMaxAngularSpeed;
+    
 
     // Robot-relative: speeds are relative to robot's current orientation
     // Field-relative: speeds are relative to field (requires gyro)

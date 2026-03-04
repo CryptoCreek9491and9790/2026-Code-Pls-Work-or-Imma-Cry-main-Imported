@@ -5,6 +5,7 @@ import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import frc.robot.Constants.ModuleConstants;
+import frc.robot.Constants.UtilityConstants;
 
 public final class Configs {
 
@@ -34,7 +35,7 @@ public final class Configs {
                     .pid(0.04, 0, 0)
                     .outputRange(-1, 1)
                     .feedForward.kV(drivingVelocityFeedForward);
-
+        
             turningConfig
                     .idleMode(IdleMode.kBrake)
                     .smartCurrentLimit(20);
@@ -84,7 +85,7 @@ public final class Configs {
                 //Make sure to tune PID gains- start with a small P value liek .01
                 // and increase until it reaches the setpoint without oscillation 
                 .pid(.01, 0, 0)
-                .outputRange(-.4, .4) //Limits max power for safety while tuning
+                .outputRange(-.2, .2) //Limits max power for safety while tuning
                 .positionWrappingEnabled(false);
         }
         }
@@ -93,6 +94,10 @@ public final class Configs {
                 public static final SparkMaxConfig HOOD_CONFIG = new SparkMaxConfig();
 
                 static {
+
+                        double nominalVoltage = 12;
+                        double vortextVelocityFeedForward = nominalVoltage/UtilityConstants.kVortexFreeSpeedRps;
+
                         SHOOTER_CONFIG
                         .inverted(false)
                         .idleMode(IdleMode.kCoast)
@@ -110,12 +115,32 @@ public final class Configs {
                         .positionConversionFactor(hoodDegreesPerRotation)
                         .velocityConversionFactor( hoodDegreesPerRotation/ 60);     
                         HOOD_CONFIG.closedLoop
-                        .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
+                        .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
                     // TODO: tune PID gains - start with a small P value like 0.01
                     // and increase until it reaches the setpoint without oscillating
                     .pid(0.01, 0.0, 0.0)
                     .outputRange(-0.3, 0.3)  // Limit max power for safety while tuning
-                    .positionWrappingEnabled(false); // Hood likely has hard stops, so no wrapping
+                    .positionWrappingEnabled(false) // Hood likely has hard stops, so no wrapping
+                    .feedForward.kV(vortextVelocityFeedForward);
                   }
                 }
+        public static final class HopperSubsystem {
+                public static final SparkMaxConfig ROLLER_CONFIG = new SparkMaxConfig();
+                public static final SparkMaxConfig INDEXER_CONFIG = new SparkMaxConfig();
+
+        static {
+                ROLLER_CONFIG
+                .inverted(false)
+                .idleMode(IdleMode.kCoast)
+                .openLoopRampRate(1)
+                .smartCurrentLimit(40);
+
+                INDEXER_CONFIG
+                .inverted(false)
+                .idleMode(IdleMode.kCoast)
+                .openLoopRampRate(1)
+                .smartCurrentLimit(40);
+        }
+        }
+
         }

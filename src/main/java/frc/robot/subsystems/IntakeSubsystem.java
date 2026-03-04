@@ -8,8 +8,11 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.units.measure.Velocity;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs;
 import frc.robot.Constants.IntakeSubsystemConstants;
@@ -26,6 +29,7 @@ public class IntakeSubsystem extends SubsystemBase {
         new SparkMax(IntakeSubsystemConstants.kPivotMotorCanId, MotorType.kBrushless);
     private final SparkClosedLoopController pivotController = PivotMotor.getClosedLoopController();
     private final AbsoluteEncoder pivotEncoder = PivotMotor.getAbsoluteEncoder();
+
 
     public IntakeSubsystem() {
 
@@ -47,14 +51,17 @@ public class IntakeSubsystem extends SubsystemBase {
         IntakeMotor.set(power);
     }
 
-    //Set the intake pivot power in the range of [-1,1]
     private void setPivotAngle(double degrees) {
         pivotController.setSetpoint(degrees, ControlType.kPosition);
     }
 
+
+
     public double getPivotAngle() {
         return pivotEncoder.getPosition();
     }
+
+    
 
     public boolean pivotAtSetpoint( double targetDegrees) {
         return Math.abs(getPivotAngle() - targetDegrees) < IntakeSubsystemConstants.kPivotToleranceDegrees;
@@ -65,26 +72,25 @@ public class IntakeSubsystem extends SubsystemBase {
 
 
     public Command runDownCommand() {
-        return this.startEnd(
-        () -> {
-            setPivotAngle(PivotSetpoints.kDown);
-            setIntakePower(IntakeSetpoints.kIntake);
-        },
-        () -> {
-            setPivotAngle(PivotSetpoints.kUp);
-            setIntakePower(0);
+        return new InstantCommand(() -> {
+            setPivotAngle(160);
         }
-        ).withName("IntakeDownandRun");
+            ,this);
         }
 
     //Stows the intake: moves pivot up. Intake rollers stay off.
     // Holds the up position until interrupted.
     public Command runUpCommand() {
-        return this.runOnce( () -> 
-        setPivotAngle(PivotSetpoints.kUp))
-        .withName("PivotUp");
+        return new InstantCommand(() ->{
+            setPivotAngle(1);
+        }
+        ,this);
     }
 
+    public Command runIntakeCommand() {
+        return this.runOnce( () ->
+        setIntakePower(-.4));
+    }
     //Reverses the intake roller to eject balls
     //Pivot stays where it is
     public Command ejectCommand() {
