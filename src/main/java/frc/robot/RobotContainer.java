@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.Commands.AlignToTagCommand;
+import frc.robot.Commands.AlignToTagCommand;
 import frc.robot.Configs.ShooterSubsystem;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Util.FuelSim;
@@ -49,10 +49,20 @@ public class RobotContainer {
  private final XboxController driverController = new XboxController(0);
  private final XboxController opController = new XboxController(1);
 
+ //Camera for vision alignment
+ private final PhotonCamera camera = new PhotonCamera("maincam");
  
  // AprilTag field layout for getting tag poses
  private final AprilTagFieldLayout fieldLayout = AprilTagFields.k2026RebuiltAndymark.loadAprilTagLayoutField();
 
+ //Vision Alignment Constants
+ private static final double VISION_TURN_kP = 0.1;
+ private static final double VISION_STRAFE_kP = 0.5;
+ private static final double VISION_DES_RANGE_m = 1.5;
+ private static final double VISION_RANGE_DEADBAND_m = 0.1; // Stop moving when within 10cm of target
+ 
+ // PID Controller for range control (better than simple P controller)
+ private final PIDController rangeController = new PIDController(0.5, 0.0, 0.05);
 
 private int debugCounter = 0;
 
@@ -110,7 +120,6 @@ public XboxController getDriverController() {
    * {@link JoystickButton}.
    */
   private void configureButtonBindings() {
-    
 
     new JoystickButton(driverController, XboxController.Button.kRightBumper.value)
     .onTrue(intakeSubsystem.runUpCommand());
@@ -128,7 +137,7 @@ public XboxController getDriverController() {
 
   //A Button- Allign to Tag 25
   new JoystickButton(driverController, XboxController.Button.kA.value)
-    .whileTrue(new AlignToTagCommand(drivetrain, vision.getCamera(), fieldLayout));
+    .whileTrue(new AlignToTagCommand(drivetrain, vision.getFrontLeftCamera(), vision.getFrontRightCamera(), fieldLayout));
   }
   
 

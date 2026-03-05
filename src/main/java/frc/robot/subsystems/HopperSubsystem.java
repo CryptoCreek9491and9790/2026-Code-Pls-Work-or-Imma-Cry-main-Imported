@@ -21,8 +21,6 @@ public class HopperSubsystem extends SubsystemBase {
     private final SparkMax indexerMotor =
         new SparkMax(HopperSubsystemConstants.kindexerMotorCandId, MotorType.kBrushless);
     
-    private final SparkClosedLoopController rollerController = rollerMotor.getClosedLoopController();
-    private final SparkClosedLoopController indexerController = indexerMotor.getClosedLoopController();
     
     public HopperSubsystem() {
       rollerMotor.configure(Configs.HopperSubsystem.ROLLER_CONFIG,
@@ -49,7 +47,7 @@ public class HopperSubsystem extends SubsystemBase {
                 this.setindexerPower(IndexerSetpoints.kIndex);
             }, () -> {
                 this.setRollerPower(0);
-                this.setRollerPower(0);
+                this.setindexerPower(0);
             } );
     }
 }

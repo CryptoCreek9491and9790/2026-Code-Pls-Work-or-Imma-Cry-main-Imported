@@ -88,8 +88,9 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public Command runIntakeCommand() {
-        return this.runOnce( () ->
-        setIntakePower(-.4));
+        return this.startEnd( () ->
+        setIntakePower(-.4),
+        () -> setIntakePower(0));
     }
     //Reverses the intake roller to eject balls
     //Pivot stays where it is

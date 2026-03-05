@@ -1,4 +1,4 @@
-package frc.Commands;
+package frc.robot.Commands;
 
 import org.photonvision.PhotonCamera;
 
@@ -16,24 +16,26 @@ public class AlignToTagCommand extends Command {
 
     //How close you want to stop from the tag(meters)
     private static final double DESIRED_RANGE_M = .7;
-    private static final double RANGE_DEADBAND_M = .3;
+    private static final double RANGE_DEADBAND_M = .1;
 
     //PID for yaw correction (turning to face the tag)
     //Tune kP:increase if turning is too slow, decrease if it oscillates
-    private final PIDController yawController = new PIDController(.2, 0, 1);
+    private final PIDController yawController = new PIDController(.2, 0, 0);
     private final PIDController rangeController = new PIDController(.5, 0, .05);
 
     private final DriveSubsystem drivetrain;
-    private final PhotonCamera camera;
+    private final PhotonCamera frontRightCamera;
+    private final PhotonCamera frontLeftCamera;
     private final AprilTagFieldLayout fieldLayout;
     
-    public AlignToTagCommand(DriveSubsystem drivetrain, PhotonCamera camera, AprilTagFieldLayout fieldLayout) {
+    public AlignToTagCommand(DriveSubsystem drivetrain, PhotonCamera frontLeftCamera, PhotonCamera frontRightCamera, AprilTagFieldLayout fieldLayout) {
         this.drivetrain = drivetrain;
-        this.camera = camera;
+        this.frontLeftCamera = frontLeftCamera;
+        this.frontRightCamera = frontRightCamera;
         this.fieldLayout = fieldLayout;
         addRequirements(drivetrain);
 
-        yawController.setTolerance(30); //Degrees
+        yawController.setTolerance(5); //Degrees
         rangeController.setTolerance(RANGE_DEADBAND_M);
     }
 
@@ -45,41 +47,28 @@ public class AlignToTagCommand extends Command {
 
     @Override
     public void execute() {
-        double targetYaw = 0;
-        int targetId = -1;
-        boolean targetVisible = false;
+        CameraTarget found = findTarget(frontLeftCamera);
+        if (found == null) found = findTarget(frontRightCamera);
 
-        var result = camera.getLatestResult();
-        if (result.hasTargets()) {
-            for (var target : result.getTargets()) {
-                for (int id : TARGET_IDS) {
-                    if (target.getFiducialId() == id) {
-                        targetYaw = target.getYaw();
-                        targetId = target.getFiducialId();
-                        targetVisible = true;
-                        break;
-                    }
-                }
-                if (targetVisible) break;
-            }
-            
-        }
-
-        if (!targetVisible) {
+        if (found == null) {
             stop();
-            return; 
+            SmartDashboard.putBoolean("Align/Target Visible", false);
+            SmartDashboard.putString("Align/Camera used", "none");
+            return;
         }
 
-        //Calculate turn speed from camera yaw
-        //Yaw controller drives targetYaw to 0, (centered on tag)
-        double turn = yawController.calculate(targetYaw, 0);
+        SmartDashboard.putBoolean("Align/Target Visible", true);
+        SmartDashboard.putNumber("Align/Matched Tag ID",  found.id);
+        SmartDashboard.putString("Align/Camera Used",     found.cameraName);
+
+        double turn = yawController.calculate(found.yaw, 0);
         turn = Math.max(-.5, Math.min(.5, turn));
 
         //Calculate drive speeds from field pose
         double xSpeed = 0;
         double ySpeed = 0;
 
-        var tagPose = fieldLayout.getTagPose(targetId);
+        var tagPose = fieldLayout.getTagPose(found.id);
         if (tagPose.isPresent()) {
             Pose2d robotPose = drivetrain.getPose();
 
@@ -102,8 +91,6 @@ public class AlignToTagCommand extends Command {
             }
             
         }
-        SmartDashboard.putNumber("Align/MatchedTagID", targetId);
-        SmartDashboard.putBoolean("Align/Target Visible", targetVisible);
 
         drivetrain.drive(xSpeed, ySpeed, turn, true);
     }
@@ -121,5 +108,31 @@ public class AlignToTagCommand extends Command {
     }
     private void stop() {
         drivetrain.drive(0, 0, 0, false);
+    }
+
+    private CameraTarget findTarget(PhotonCamera camera) {
+        var result = camera.getLatestResult();
+        if (!result.hasTargets()) return null;
+
+        for (var target : result.getTargets()) {
+            for (int id : TARGET_IDS) {
+                if (target.getFiducialId() == id) {
+                    return new CameraTarget(id, target.getYaw(), camera.getName());
+                }
+            }
+        }
+        return null;
+    }
+
+    private static class CameraTarget {
+        final int id;
+        final double yaw;
+        final String cameraName;
+
+        CameraTarget(int id, double yaw, String cameraName) {
+            this.id = id;
+            this.yaw = yaw;
+            this.cameraName = cameraName;
+        }
     }
 }

@@ -81,11 +81,29 @@ public final class Constants {
   }
    public static class Vision {
 
-    public static final String kCameraName = "maincam";
-    public static final Transform3d kRobotToCam =
+    public static final String kFrontLeftCameraName = "FrontLeft";
+    public static final String kFrontRightCameraName = "Front Right";
+    //Change the transformation 3d values later 
+    public static final Transform3d kRobotToFrontLeftCamera =
       new Transform3d(
-        new Translation3d(0.2, 0, .5),
-        new Rotation3d(0, 0, 0));
+        new Translation3d(0.2 ,//Meters forward from robot center
+         0,//Meters left or right of center
+          .5), //Meters above the ground
+        new Rotation3d(0, //Leave 0 unless camera is tilted sideways
+         0, //Tilt down toward floor = negative radians 
+          0)); // How many degress the camera faces outward
+
+    
+  //Change the transformation 3d values later 
+    public static final Transform3d kRobotToFrontRightCamera =
+      new Transform3d(
+        new Translation3d(0.2 ,//Meters forward from robot center
+         0,//Meters left or right of center
+          .5), //Meters above the ground
+        new Rotation3d(0, //Leave 0 unless camera is tilted sideways
+         0, //Tilt down toward floor = negative radians 
+          0)); // How many degress the camera faces outward
+
 
         // The layout of the AprilTags on the field
         public static final AprilTagFieldLayout kTagLayout =
