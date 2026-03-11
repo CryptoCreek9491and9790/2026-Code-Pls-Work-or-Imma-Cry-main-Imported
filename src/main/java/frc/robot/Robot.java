@@ -56,6 +56,9 @@ public class Robot extends TimedRobot {
     
     drivetrain = m_robotContainer.getDrivetrain(); // <-- Get the drivetrain
 
+    System.out.println("=== NEW CODE LOADED ===");
+
+
   }
   
 

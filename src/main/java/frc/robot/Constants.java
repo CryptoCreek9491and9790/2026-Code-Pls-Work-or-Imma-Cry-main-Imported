@@ -40,13 +40,13 @@ public final class Constants {
     public static final double kShooterSpeed = .5;
 
     public static final class ShooterSetpoints {
-      public static final double kShoot = .6;
+      public static final double kShoot = .75;
       public static final double kidle = 0;
     }
     public static final class HoodSetpoints {
       public static final double kClose = 30; //Change All these later
       public static final double kFar = 60; //Way less please change later
-      public static final double kStow = 10; //Resting change
+      public static final double kStow = 200; //Resting change
     }
 
     public static final double kHoodToleranceDegrees = 1;
@@ -57,7 +57,7 @@ public final class Constants {
     public static final int kindexerMotorCandId = 21;
 
     public static final class RollerSetpoints{
-      public static final double kRoll = .1;
+      public static final double kRoll = -.1;
     }
 
     public static final class IndexerSetpoints{
@@ -119,7 +119,7 @@ public final class Constants {
     // Driving Parameters - Note that these are not the maximum capable speeds of
     // the robot, rather the allowed maximum speeds
     public static final double kMaxSpeedMetersPerSecond = 4.8;
-    public static final double kMaxAngularSpeed = 1 * Math.PI; // radians per second
+    public static final double kMaxAngularSpeed = 2 * Math.PI; // radians per second
 
     // Chassis configuration
     public static final double kTrackWidth = Units.inchesToMeters(26.5);
@@ -160,7 +160,7 @@ public final class Constants {
     // The MAXSwerve module can be configured with one of three pinion gears: 12T,
     // 13T, or 14T. This changes the drive speed of the module (a pinion gear with
     // more teeth will result in a robot that drives faster).
-    public static final int kDrivingMotorPinionTeeth = 14;
+    public static final int kDrivingMotorPinionTeeth = 13;
 
     // Calculations required for driving motor conversion factors and feed forward
     public static final double kDrivingMotorFreeSpeedRps = NeoMotorConstants.kFreeSpeedRpm / 60;

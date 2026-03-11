@@ -85,7 +85,7 @@ public class DriveSubsystem extends SubsystemBase {
 
     m_odometry = new SwerveDriveOdometry(
         DriveConstants.kDriveKinematics,
-        Rotation2d.fromDegrees(m_gyro.getAngle()),
+        Rotation2d.fromDegrees(m_gyro.getYaw()),
         new SwerveModulePosition[] {
             m_frontLeft.getPosition(),
             m_frontRight.getPosition(),
@@ -132,7 +132,7 @@ public class DriveSubsystem extends SubsystemBase {
     if (RobotBase.isSimulation()) {
       return m_simGyroAngle;
     } else {
-      return m_gyro.getAngle();
+      return m_gyro.getYaw();
 
     }
     }
@@ -180,8 +180,6 @@ public class DriveSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Gyro Pitch", m_gyro.getPitch());
         SmartDashboard.putNumber("Gyro Roll", m_gyro.getRoll());
         
-        //Drive mode info
-        SmartDashboard.putString("Drive Mode", "Robot-Relative");
     }
 
     /** Returns heading from the gyro in degrees. */
@@ -215,7 +213,7 @@ public class DriveSubsystem extends SubsystemBase {
         m_rearLeft.getPosition(),
         m_rearRight.getPosition()
     };
-    Rotation2d rotation =Rotation2d.fromDegrees(m_gyro.getAngle());
+    Rotation2d rotation =Rotation2d.fromDegrees(m_gyro.getYaw());
 
     m_odometry.resetPosition(rotation, positions, pose);
     poseEstimator.resetPosition(rotation, positions, pose);
@@ -279,11 +277,7 @@ public class DriveSubsystem extends SubsystemBase {
         SwerveDriveKinematics.desaturateWheelSpeeds(
         swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);  
 
-  System.out.println(String.format(
-    "FL:  %.2f m/s @ %.1f°, FR: %.2f m/s @ %.1f",
-    swerveModuleStates[0].speedMetersPerSecond, swerveModuleStates[0].angle.getDegrees(),
-    swerveModuleStates[1].speedMetersPerSecond, swerveModuleStates[1].angle.getDegrees()
-  ));
+  
 
   m_frontLeft.setDesiredState(swerveModuleStates[0]);
   m_frontRight.setDesiredState(swerveModuleStates[1]);

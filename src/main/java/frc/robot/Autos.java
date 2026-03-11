@@ -3,31 +3,93 @@ package frc.robot;
 import choreo.auto.AutoFactory;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.Configs.IntakeSubsystem;
+import frc.robot.Configs.ShooterSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.HopperSubsystem;
 
 public class Autos {
-    private final AutoFactory factory;
+    /*private final AutoFactory factory;
     private final DriveSubsystem drivetrain;
+    private final ShooterSubsystem shooter;
+    private final HopperSubsystem hopper;
+    private final IntakeSubsystem intake;
+
+    private static final double SHOOTER_SPINUP_SECONDS = 1;
+
+    private static final double SHOOT_DURATION_SECONDS = 2.5;
+
+    private static final double INTAKE_DURATION_SECONDS = 2;
     
-    public Autos (DriveSubsystem swerve) {
-        this.drivetrain = swerve;
+    public Autos (DriveSubsystem drivetrain,
+                  ShooterSubsystem shooter,
+                  HopperSubsystem hopper,
+                  IntakeSubsystem intake) {
+        this.drivetrain = drivetrain;
+        this.shooter = shooter;
+        this.hopper = hopper;
+        this.intake = intake;
+
         factory = new AutoFactory(
-            swerve::getPose,
-            swerve:: resetOdometry,
-            swerve::followTrajectory,
+            drivetrain::getPose,
+            drivetrain:: resetOdometry,
+            drivetrain::followTrajectory,
             true,
-            swerve);
+            drivetrain);
     }
 
+ /*
+  * 1.Deploy intake and drive to the hub
+    2.Spin up shooter, set hood to close position
+    3.Feed hopper to shoot preloaded fuel
+    4. Drive to depot and intake more fuel
+    5. Drive back to hub
+    6. Shoot again
+    7. Drive to hanging zone to be near hang pieces
+  
+
+  public Command fullAuto() {
+    var routine = factory.newRoutine("Full Auto");
+
+    var driveToHub = routine.trajectory("DriveToHub");
+    var hubToDepot = routine.trajectory("DepotToHub");
+    var DepotToHub = routine.trajectory("DepotToHub");
+    var hubToHang = routine.trajectory("HubToHang");
+
+    routine.active().onTrue(
+        Commands.sequence(
+            //Reset odom and drive to hub
+            driveToHub.resetOdometry(),
+            Commands.parallel(
+                driveToHub.cmd(),
+            intake.runDownCommand() //deploy intake arm while driving
+        ),
+        //Spin up shooter and set hood
+        //Run shooter motor and set hood simultaneously, then wait for spinup
+        Commands.parallel(
+            shooter.hoodCloseCommand(),
+            shooter.shootCommand().withTimeout(SHOOTER_SPINUP_SECONDS)
+        ),
+
+        //Feed hopper to shoot preloaded fuel
+        //Keep shooter running and run hopper to feed balls in
+        Commands.parallel(
+            shooter.shootCommand().withTimeout(SHOOT_DURATION_SECONDS),
+            hopper.rollCommand().withTimeout(SHOOT_DURATION_SECONDS)
+        ),
+
+        Commands.runOnce(() -> drivetrain.drive(0, 0, 0, false), drivetrain));
 
 
+    )
+  }
 public Command newPath() {
-    final var routine = factory.newRoutine("test 2");
-    final var traj1 = routine.trajectory("Path1");
-    final var traj2 = routine.trajectory("Path2");
+    var routine = factory.newRoutine("test 2");
+    var traj1 = routine.trajectory("Path1");
+    var traj2 = routine.trajectory("Path2");
 
-    return Commands.sequence(
-        Commands.runOnce(routine::poll),
+    routine.active().onTrue(
+        Commands.sequence(
         traj1.resetOdometry(),
         traj1.cmd(),
         Commands.runOnce(()-> drivetrain.drive(0, 0, 0, false), drivetrain),
@@ -35,6 +97,6 @@ public Command newPath() {
         traj2.cmd(),
         Commands.runOnce(() -> drivetrain.drive(0, 0, 0, false), drivetrain)
         )
-        ;
-    }
-}
+    );    
+    return routine.cmd();
+} */}

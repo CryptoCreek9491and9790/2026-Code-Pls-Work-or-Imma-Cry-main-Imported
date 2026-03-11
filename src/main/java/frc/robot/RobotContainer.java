@@ -13,14 +13,16 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Commands.AlignToTagCommand;
-import frc.robot.Configs.ShooterSubsystem;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Util.FuelSim;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.HopperSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.Vision;
 
 import org.photonvision.PhotonCamera;
@@ -44,16 +46,18 @@ public class RobotContainer {
   private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
   private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
   private final Vision vision = new Vision(drivetrain::addVisionMeasurement);
+  private final HopperSubsystem hopperSubsystem = new HopperSubsystem();
 
   // The driver's controller
  private final XboxController driverController = new XboxController(0);
  private final XboxController opController = new XboxController(1);
 
- //Camera for vision alignment
- private final PhotonCamera camera = new PhotonCamera("maincam");
- 
+  
  // AprilTag field layout for getting tag poses
  private final AprilTagFieldLayout fieldLayout = AprilTagFields.k2026RebuiltAndymark.loadAprilTagLayoutField();
+
+ //Field Relativity
+ private boolean fieldRelative = true;
 
  //Vision Alignment Constants
  private static final double VISION_TURN_kP = 0.1;
@@ -67,7 +71,7 @@ public class RobotContainer {
 private int debugCounter = 0;
 
 //Auto stuff
-private final Autos autos = new Autos(drivetrain);
+//private final Autos autos = new Autos(drivetrain);
 private final SendableChooser<Command> autoChooser = new SendableChooser<>(); 
 
 // Getter method
@@ -82,6 +86,8 @@ public XboxController getDriverController() {
     configureButtonBindings(
   
     );
+
+
     
     // Configure default commands
     drivetrain.setDefaultCommand(
@@ -94,13 +100,13 @@ public XboxController getDriverController() {
                 double ySpeed = -MathUtil.applyDeadband(driverController.getLeftX(), OIConstants.kDriveDeadband);
                 double rot = -MathUtil.applyDeadband(driverController.getRightX(), OIConstants.kDriveDeadband);
 
-            if (debugCounter++ % 50 == 0) {
-              System.out.println(String.format(
-                "Drive inputs - X: %.2f, Y:%.2f, Rot: %.2f (Robot-Relative)", xSpeed, ySpeed, rot));}
                 // Robot-relative drive: false = robot-relative, true = field-relative
-                drivetrain.drive(xSpeed, ySpeed, rot, false);
+                SmartDashboard.putString("Drive Mode", fieldRelative ? "robotrelative" : "field-Relative");
+
+
+                drivetrain.drive(xSpeed, ySpeed, rot, fieldRelative);
             }, drivetrain));
-      autoChooser.setDefaultOption("test 2", autos.newPath());
+      //autoChooser.setDefaultOption("test 2", autos.newPath());
     SmartDashboard.putData("autoChooser", autoChooser);
 
     if (RobotBase.isSimulation()) {
@@ -121,6 +127,16 @@ public XboxController getDriverController() {
    */
   private void configureButtonBindings() {
 
+
+    new JoystickButton(driverController, XboxController.Button.kBack.value)
+      .onTrue(new InstantCommand(() -> fieldRelative = !fieldRelative));
+
+    //new JoystickButton(driverController, XboxController.Button.kY.value)
+      //.onTrue(new InstantCommand(() -> drivetrain.zeroHeading()));
+
+      //new JoystickButton(driverController, XboxController.Button.kY.value)
+      //.toggleOnTrue(shooterSubsystem.hoodStowCommand());
+
     new JoystickButton(driverController, XboxController.Button.kRightBumper.value)
     .onTrue(intakeSubsystem.runUpCommand());
 
@@ -135,10 +151,18 @@ public XboxController getDriverController() {
     new JoystickButton(driverController, XboxController.Button.kA.value)
       .whileTrue(intakeSubsystem.runIntakeCommand());
 
+    new JoystickButton(driverController, XboxController.Button.kA.value)
+      .whileTrue(hopperSubsystem.rollCommand());
+
+    new JoystickButton(driverController, XboxController.Button.kX.value)
+      .toggleOnTrue(shooterSubsystem.shootCommand());
+
   //A Button- Allign to Tag 25
-  new JoystickButton(driverController, XboxController.Button.kA.value)
+  new JoystickButton(driverController, XboxController.Button.kB.value)
     .whileTrue(new AlignToTagCommand(drivetrain, vision.getFrontLeftCamera(), vision.getFrontRightCamera(), fieldLayout));
   }
+  
+
   
 
   /**

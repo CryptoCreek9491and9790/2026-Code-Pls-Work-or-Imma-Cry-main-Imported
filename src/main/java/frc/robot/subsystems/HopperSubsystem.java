@@ -43,7 +43,7 @@ public class HopperSubsystem extends SubsystemBase {
     public Command rollCommand() {
         return this.startEnd(
             () -> {
-                this.setRollerPower(RollerSetpoints.kRoll);
+                //this.setRollerPower(RollerSetpoints.kRoll);
                 this.setindexerPower(IndexerSetpoints.kIndex);
             }, () -> {
                 this.setRollerPower(0);
