@@ -59,16 +59,7 @@ public class RobotContainer {
  //Field Relativity
  private boolean fieldRelative = true;
 
- //Vision Alignment Constants
- private static final double VISION_TURN_kP = 0.1;
- private static final double VISION_STRAFE_kP = 0.5;
- private static final double VISION_DES_RANGE_m = 1.5;
- private static final double VISION_RANGE_DEADBAND_m = 0.1; // Stop moving when within 10cm of target
- 
- // PID Controller for range control (better than simple P controller)
- private final PIDController rangeController = new PIDController(0.5, 0.0, 0.05);
 
-private int debugCounter = 0;
 
 //Auto stuff
 //private final Autos autos = new Autos(drivetrain);
@@ -101,7 +92,7 @@ public XboxController getDriverController() {
                 double rot = -MathUtil.applyDeadband(driverController.getRightX(), OIConstants.kDriveDeadband);
 
                 // Robot-relative drive: false = robot-relative, true = field-relative
-                SmartDashboard.putString("Drive Mode", fieldRelative ? "robotrelative" : "field-Relative");
+                SmartDashboard.putString("Drive Mode", fieldRelative ? "Field-Relative" : "Robot-Relative");
 
 
                 drivetrain.drive(xSpeed, ySpeed, rot, fieldRelative);
@@ -152,10 +143,10 @@ public XboxController getDriverController() {
       .whileTrue(intakeSubsystem.runIntakeCommand());
 
     new JoystickButton(driverController, XboxController.Button.kA.value)
-      .whileTrue(hopperSubsystem.rollCommand());
+      .toggleOnTrue(hopperSubsystem.rollCommand());
 
     new JoystickButton(driverController, XboxController.Button.kX.value)
-      .toggleOnTrue(shooterSubsystem.shootCommand());
+      .toggleOnTrue(shooterSubsystem.shootCommand(() -> vision.getHubDistance()));
 
   //A Button- Allign to Tag 25
   new JoystickButton(driverController, XboxController.Button.kB.value)

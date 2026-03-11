@@ -35,21 +35,7 @@ public final class Constants {
 
   public static final class ShooterSubsystemConstants {
     public static final int kShooterMotorCanId = 18;
-    public static final int KHoodMotorCanId = 19;
-
-    public static final double kShooterSpeed = .5;
-
-    public static final class ShooterSetpoints {
-      public static final double kShoot = .75;
-      public static final double kidle = 0;
-    }
-    public static final class HoodSetpoints {
-      public static final double kClose = 30; //Change All these later
-      public static final double kFar = 60; //Way less please change later
-      public static final double kStow = 200; //Resting change
-    }
-
-    public static final double kHoodToleranceDegrees = 1;
+    public static final int KBackRollerMotorCanId = 19;
   }
 
   public static final class HopperSubsystemConstants{
@@ -77,7 +63,7 @@ public final class Constants {
       public static final double kDown = 160; //Tune Arm Deployed
     } 
 
-    public static final double kPivotToleranceDegrees = .01;
+    public static final double kPivotToleranceDegrees = .2;
   }
    public static class Vision {
 

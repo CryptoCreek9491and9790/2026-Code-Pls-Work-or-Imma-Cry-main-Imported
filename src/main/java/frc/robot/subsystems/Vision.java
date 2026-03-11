@@ -1,6 +1,5 @@
 package frc.robot.subsystems;
   
-import java.lang.StackWalker.Option;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 
@@ -9,7 +8,6 @@ import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
-import org.photonvision.proto.Photon;
 import org.photonvision.simulation.PhotonCameraSim;
 import org.photonvision.simulation.SimCameraProperties;
 import org.photonvision.simulation.VisionSystemSim;
@@ -24,9 +22,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Robot;
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
-import edu.wpi.first.cameraserver.CameraServer;
 
     
 public class Vision extends SubsystemBase {
@@ -165,6 +160,26 @@ public class Vision extends SubsystemBase {
   }
 
   return estStdDevs;
+ }
+
+ public double getHubDistance() {
+  for (PhotonCamera camera : new PhotonCamera[] {frontLeftCamera, frontRightCamera}) {
+    PhotonPipelineResult result = camera.getLatestResult();
+    if (!result.hasTargets()) continue;
+
+    for (var target: result.getTargets()) {
+      int id = target.getFiducialId();
+      if (id == 10 || id == 25) {
+        double distance = target.getBestCameraToTarget()
+        .getTranslation().getNorm();
+        SmartDashboard.putNumber("Shooter/Distance (m)", distance);
+        return distance;
+      }
+    }
+  }
+
+  SmartDashboard.putNumber("Shooter/Hub Distance (m)", -1);
+  return 3;
  }
 
  public PhotonCamera getCamera() {return frontLeftCamera;}

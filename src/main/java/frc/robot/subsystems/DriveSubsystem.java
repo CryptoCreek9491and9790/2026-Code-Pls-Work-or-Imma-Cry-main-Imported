@@ -49,7 +49,7 @@ public class DriveSubsystem extends SubsystemBase {
       DriveConstants.kBackRightChassisAngularOffset);
 
   // The gyro sensor
-  private final AHRS m_gyro = new AHRS(AHRS.NavXComType.kMXP_SPI);
+  public final AHRS m_gyro = new AHRS(AHRS.NavXComType.kUSB1);
   public SwerveDrivePoseEstimator poseEstimator;
   private final SwerveDriveOdometry m_odometry;
 
@@ -162,7 +162,6 @@ public class DriveSubsystem extends SubsystemBase {
 
         // Example module logging (if you want individual wheel states)
         // Adjust names as needed
-        Pose2d odomPose = m_odometry.getPoseMeters();
         SmartDashboard.putNumber("Front Left Module Angle (deg)", m_frontLeft.getState().angle.getDegrees());
         SmartDashboard.putNumber("Front Left Module Speed (m/s)", m_frontLeft.getState().speedMetersPerSecond);
 

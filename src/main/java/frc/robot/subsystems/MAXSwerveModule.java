@@ -32,7 +32,6 @@ public class MAXSwerveModule {
   private double m_simDriveVelocity = 0;
   private double m_simTurnVelocity = 0;
 
-  private static final double kDriveSimP = 10.0;
   private static final double kTurnSimP = 20.0;
   private static final double kSimUpdatePeriod = .02;
 

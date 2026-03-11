@@ -91,37 +91,35 @@ public final class Configs {
         }
         public static final class ShooterSubsystem {
                 public static final SparkMaxConfig SHOOTER_CONFIG = new SparkMaxConfig();
-                public static final SparkMaxConfig HOOD_CONFIG = new SparkMaxConfig();
+                public static final SparkMaxConfig BACKROLLER_CONFIG = new SparkMaxConfig();
 
                 static {
 
-                        double nominalVoltage = 12;
-                        double vortextVelocityFeedForward = nominalVoltage/UtilityConstants.kVortexFreeSpeedRps;
 
                         SHOOTER_CONFIG
                         .inverted(false)
                         .idleMode(IdleMode.kCoast)
-                        .openLoopRampRate(.5)
                         .smartCurrentLimit(40);
-
-                        double hoodDegreesPerRotation = 360;
-
-                        HOOD_CONFIG
-                        .inverted(false)
-                        .idleMode(IdleMode.kBrake)
-                        .smartCurrentLimit(40);
-                       
-                        HOOD_CONFIG.absoluteEncoder
-                        .positionConversionFactor(hoodDegreesPerRotation)
-                        .velocityConversionFactor( hoodDegreesPerRotation/ 60);     
-                        HOOD_CONFIG.closedLoop
+                        SHOOTER_CONFIG.encoder
+                        .velocityConversionFactor(1); //Native RPM
+                        SHOOTER_CONFIG.closedLoop
                         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-                    // TODO: tune PID gains - start with a small P value like 0.01
-                    // and increase until it reaches the setpoint without oscillating
-                    .pid(0.01, 0.0, 0.0)
-                    .outputRange(-0.3, 0.3)  // Limit max power for safety while tuning
-                    .positionWrappingEnabled(false) // Hood likely has hard stops, so no wrapping
-                    .feedForward.kV(vortextVelocityFeedForward);
+                        .pid(.0005, 0, 0)
+                        .outputRange(-1, 1)
+                        .feedForward.kV(1 / UtilityConstants.kVortexFreeSpeedRps / 60);
+
+
+                        BACKROLLER_CONFIG
+                        .inverted(false)
+                        .idleMode(IdleMode.kCoast)
+                        .smartCurrentLimit(40);
+                        BACKROLLER_CONFIG.encoder
+                        .velocityConversionFactor(1); //Native RPM
+                        BACKROLLER_CONFIG.closedLoop
+                        .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+                        .pid(.0005, 0, 0)
+                        .outputRange(-1, 1)
+                        .feedForward.kV(1 / UtilityConstants.kVortexFreeSpeedRps / 60);
                   }
                 }
         public static final class HopperSubsystem {

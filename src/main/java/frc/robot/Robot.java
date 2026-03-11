@@ -4,19 +4,13 @@
 
 package frc.robot;
 
-import org.photonvision.simulation.PhotonCameraSim;
-
-import com.revrobotics.spark.SparkMax;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.DriveSubsystem;
-import frc.robot.subsystems.Vision;
 
 
 /**
@@ -30,12 +24,9 @@ public class Robot extends TimedRobot {
   private RobotContainer m_robotContainer;
 
   //Subsystems
-  private Vision vision;
   private DriveSubsystem drivetrain;
 
   //PhotonVision Simulation
-  private PhotonCameraSim camerasim;
-  private RobotContainer driverController;
 
   Pose2d[] gamePieces = new Pose2d[] {
     new Pose2d(4.0, 3.0, new Rotation2d()),
@@ -122,6 +113,10 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand !=null) {
       m_autonomousCommand.cancel();
     }
+
+    if (m_autonomousCommand != null) m_autonomousCommand.cancel();
+    System.out.println("NavX Connected:" + drivetrain.m_gyro.isConnected());
+    System.out.println("NavX Yaw:" + drivetrain.m_gyro.getYaw());
   }
 
   @Override

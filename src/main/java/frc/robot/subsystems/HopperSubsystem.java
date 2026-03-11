@@ -2,7 +2,6 @@ package frc.robot.subsystems;
 
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
-import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
@@ -43,7 +42,7 @@ public class HopperSubsystem extends SubsystemBase {
     public Command rollCommand() {
         return this.startEnd(
             () -> {
-                //this.setRollerPower(RollerSetpoints.kRoll);
+                this.setRollerPower(RollerSetpoints.kRoll);
                 this.setindexerPower(IndexerSetpoints.kIndex);
             }, () -> {
                 this.setRollerPower(0);
