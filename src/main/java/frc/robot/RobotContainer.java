@@ -131,33 +131,29 @@ public XboxController getDriverController() {
       //new JoystickButton(driverController, XboxController.Button.kY.value)
       //.toggleOnTrue(shooterSubsystem.hoodStowCommand());
 
-    new JoystickButton(driverController, XboxController.Button.kRightBumper.value)
-    .onTrue(intakeSubsystem.runUpCommand());
-
-    new JoystickButton(driverController, XboxController.Button.kRightBumper.value)
+    new JoystickButton(driverController, XboxController.Button.kLeftBumper.value)
+    .onTrue(intakeSubsystem.runUpCommand())
     .onFalse(intakeSubsystem.runStopCommand());
 
-    new JoystickButton(driverController, XboxController.Button.kLeftBumper.value)
+    new JoystickButton(driverController, XboxController.Button.kRightBumper.value)
+    .onTrue(intakeSubsystem.runDownCommand())
     .onFalse(intakeSubsystem.runStopCommand());
-
-    new JoystickButton(driverController, XboxController.Button.kLeftBumper.value)
-    .onTrue(intakeSubsystem.runDownCommand());
 
     new JoystickButton(driverController, XboxController.Button.kStart.value)
         .whileTrue(new RunCommand(
             () -> drivetrain.setX(),
             drivetrain));
 
-    new JoystickButton(driverController, XboxController.Button.kX.value)
+    new JoystickButton(opController, XboxController.Button.kY.value)
       .toggleOnTrue(intakeSubsystem.runIntakeCommand());
 
-    new JoystickButton(driverController, XboxController.Button.kX.value)
+    new JoystickButton(opController, XboxController.Button.kX.value)
       .toggleOnTrue(hopperSubsystem.rollCommand());
 
-    //new JoystickButton(driverController, XboxController.Button.kx.value)
-      //.toggleOnTrue(shooterSubsystem.shootCommand(() -> vision.getHubDistance()));
+    new JoystickButton(opController, XboxController.Button.kB.value)
+      .toggleOnTrue(shooterSubsystem.shootCommand(() -> vision.getHubDistance()));
 
-    new JoystickButton(driverController, XboxController.Button.kA.value)
+    new JoystickButton(opController, XboxController.Button.kA.value)
       .toggleOnTrue(shooterSubsystem.shootFixedCommand());
 
   //A Button- Allign to Tag 25
