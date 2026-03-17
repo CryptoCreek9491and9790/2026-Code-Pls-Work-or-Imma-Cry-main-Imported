@@ -39,8 +39,9 @@ public class IntakeSubsystem extends SubsystemBase {
         ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
 
-        System.out.println("IntakeSubsystem Initialized");
     }
+
+    
 
     //Set the intake motor power in the range of [-1, 1]
     private void setIntakePower(double power) {
@@ -57,6 +58,10 @@ public class IntakeSubsystem extends SubsystemBase {
         return pivotEncoder.getPosition();
     }
 
+    private void setPivotPower(double power) {
+        PivotMotor.set(power);
+    }
+
     
 
     public boolean pivotAtSetpoint( double targetDegrees) {
@@ -69,16 +74,24 @@ public class IntakeSubsystem extends SubsystemBase {
 
     public Command runDownCommand() {
         return new InstantCommand(() -> {
-            setPivotAngle(160);
-        }
+            setPivotPower(.2);
+           }
             ,this);
         }
 
-    //Stows the intake: moves pivot up. Intake rollers stay off.
-    // Holds the up position until interrupted.
+
+
+
     public Command runUpCommand() {
         return new InstantCommand(() ->{
-            setPivotAngle(1);
+            setPivotPower(-.2);
+        }
+        ,this);
+    }
+
+    public Command runStopCommand() {
+        return new InstantCommand( () -> {
+            setPivotPower(0);
         }
         ,this);
     }

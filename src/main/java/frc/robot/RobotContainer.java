@@ -8,6 +8,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -27,6 +28,8 @@ import frc.robot.subsystems.Vision;
 
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonUtils;
+
+import choreo.auto.AutoChooser;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 
@@ -59,11 +62,11 @@ public class RobotContainer {
  //Field Relativity
  private boolean fieldRelative = true;
 
-
-
-//Auto stuff
-//private final Autos autos = new Autos(drivetrain);
-private final SendableChooser<Command> autoChooser = new SendableChooser<>(); 
+ //Auto stuff
+//private final Autos autos = new Autos(drivetrain, shooterSubsystem, hopperSubsystem, intakeSubsystem, vision);
+//AutoChooser.setDefaultOption("Full Auto", autos.fullAuto());
+//AutoChooser.addOption("Simple Shoot", autos.simpleShootAuto());
+//SmartDashboard.putData("autoChooser", autoChooser);
 
 // Getter method
 public XboxController getDriverController() {
@@ -98,7 +101,7 @@ public XboxController getDriverController() {
                 drivetrain.drive(xSpeed, ySpeed, rot, fieldRelative);
             }, drivetrain));
       //autoChooser.setDefaultOption("test 2", autos.newPath());
-    SmartDashboard.putData("autoChooser", autoChooser);
+ //   SmartDashboard.putData("autoChooser", autoChooser);
 
     if (RobotBase.isSimulation()) {
       configureFuelSim();}}
@@ -122,14 +125,20 @@ public XboxController getDriverController() {
     new JoystickButton(driverController, XboxController.Button.kBack.value)
       .onTrue(new InstantCommand(() -> fieldRelative = !fieldRelative));
 
-    //new JoystickButton(driverController, XboxController.Button.kY.value)
-      //.onTrue(new InstantCommand(() -> drivetrain.zeroHeading()));
+    new JoystickButton(driverController, XboxController.Button.kY.value)
+      .onTrue(new InstantCommand(() -> drivetrain.zeroHeading()));
 
       //new JoystickButton(driverController, XboxController.Button.kY.value)
       //.toggleOnTrue(shooterSubsystem.hoodStowCommand());
 
     new JoystickButton(driverController, XboxController.Button.kRightBumper.value)
     .onTrue(intakeSubsystem.runUpCommand());
+
+    new JoystickButton(driverController, XboxController.Button.kRightBumper.value)
+    .onFalse(intakeSubsystem.runStopCommand());
+
+    new JoystickButton(driverController, XboxController.Button.kLeftBumper.value)
+    .onFalse(intakeSubsystem.runStopCommand());
 
     new JoystickButton(driverController, XboxController.Button.kLeftBumper.value)
     .onTrue(intakeSubsystem.runDownCommand());
@@ -139,14 +148,17 @@ public XboxController getDriverController() {
             () -> drivetrain.setX(),
             drivetrain));
 
-    new JoystickButton(driverController, XboxController.Button.kA.value)
-      .whileTrue(intakeSubsystem.runIntakeCommand());
-
-    new JoystickButton(driverController, XboxController.Button.kA.value)
-      .toggleOnTrue(hopperSubsystem.rollCommand());
+    new JoystickButton(driverController, XboxController.Button.kX.value)
+      .toggleOnTrue(intakeSubsystem.runIntakeCommand());
 
     new JoystickButton(driverController, XboxController.Button.kX.value)
-      .toggleOnTrue(shooterSubsystem.shootCommand(() -> vision.getHubDistance()));
+      .toggleOnTrue(hopperSubsystem.rollCommand());
+
+    //new JoystickButton(driverController, XboxController.Button.kx.value)
+      //.toggleOnTrue(shooterSubsystem.shootCommand(() -> vision.getHubDistance()));
+
+    new JoystickButton(driverController, XboxController.Button.kA.value)
+      .toggleOnTrue(shooterSubsystem.shootFixedCommand());
 
   //A Button- Allign to Tag 25
   new JoystickButton(driverController, XboxController.Button.kB.value)
@@ -161,9 +173,9 @@ public XboxController getDriverController() {
    *
    * @return the command to run in autonomous
    */
-  public Command getAutonomousCommand() {
-    return autoChooser.getSelected();
-  }
+  //public Command getAutonomousCommand() {
+    //return autoChooser.getSelected();
+  //}
 
   public DriveSubsystem getDrivetrain() {
     return drivetrain;

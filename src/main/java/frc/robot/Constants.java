@@ -59,11 +59,11 @@ public final class Constants {
       public static final double kIntake = -.25;    } //Change values later
 
     public static final class PivotSetpoints {
-      public static final double kUp = 1; //Tune Arm STOWED
-      public static final double kDown = 160; //Tune Arm Deployed
+      public static final double kUp = 15; //Tune Arm STOWED
+      public static final double kDown = 135; //Tune Arm Deployed
     } 
 
-    public static final double kPivotToleranceDegrees = .2;
+    public static final double kPivotToleranceDegrees = 2;
   }
    public static class Vision {
 

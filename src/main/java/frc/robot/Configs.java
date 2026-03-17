@@ -85,8 +85,8 @@ public final class Configs {
                 //Make sure to tune PID gains- start with a small P value liek .01
                 // and increase until it reaches the setpoint without oscillation 
                 .pid(.01, 0, 0)
-                .outputRange(-.2, .2) //Limits max power for safety while tuning
-                .positionWrappingEnabled(false);
+                .outputRange(-.3, .3) //Limits max power for safety while tuning
+                .positionWrappingEnabled(true);
         }
         }
         public static final class ShooterSubsystem {
@@ -104,9 +104,9 @@ public final class Configs {
                         .velocityConversionFactor(1); //Native RPM
                         SHOOTER_CONFIG.closedLoop
                         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-                        .pid(.0005, 0, 0)
+                        .pid(.00005, 0, 0)
                         .outputRange(-1, 1)
-                        .feedForward.kV(1 / UtilityConstants.kVortexFreeSpeedRps / 60);
+                        .feedForward.kV(12.0 / UtilityConstants.kVortexFreeSpeedRpm);
 
 
                         BACKROLLER_CONFIG
@@ -117,7 +117,7 @@ public final class Configs {
                         .velocityConversionFactor(1); //Native RPM
                         BACKROLLER_CONFIG.closedLoop
                         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-                        .pid(.0005, 0, 0)
+                        .pid(.00005, 0, 0)
                         .outputRange(-1, 1)
                         .feedForward.kV(1 / UtilityConstants.kVortexFreeSpeedRps / 60);
                   }

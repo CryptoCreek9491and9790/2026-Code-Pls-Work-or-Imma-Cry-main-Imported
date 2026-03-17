@@ -38,14 +38,15 @@ public class Autos {
             drivetrain);
     }
 
- /*
-  * 1.Deploy intake and drive to the hub
-    2.Spin up shooter, set hood to close position
-    3.Feed hopper to shoot preloaded fuel
-    4. Drive to depot and intake more fuel
-    5. Drive back to hub
-    6. Shoot again
-    7. Drive to hanging zone to be near hang pieces
+ 
+   1.Drive Back towards shooting zone
+    2.Spin up shooters then shoot preload
+    3.Drive to depot station and collect
+    4.Go back to shoot zone
+    5. spin up shooter then shoot
+    6. Drive to hang
+    7. Hang
+
   
 
   public Command fullAuto() {
@@ -78,10 +79,10 @@ public class Autos {
             hopper.rollCommand().withTimeout(SHOOT_DURATION_SECONDS)
         ),
 
-        Commands.runOnce(() -> drivetrain.drive(0, 0, 0, false), drivetrain));
+        Commands.runOnce(() -> drivetrain.drive(0, 0, 0, true)), drivetrain));
 
 
-    )
+    
   }
 public Command newPath() {
     var routine = factory.newRoutine("test 2");
@@ -99,4 +100,4 @@ public Command newPath() {
         )
     );    
     return routine.cmd();
-} */}
+}*/ }

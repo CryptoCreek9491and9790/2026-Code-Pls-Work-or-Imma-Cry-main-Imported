@@ -132,7 +132,7 @@ public class DriveSubsystem extends SubsystemBase {
     if (RobotBase.isSimulation()) {
       return m_simGyroAngle;
     } else {
-      return m_gyro.getYaw();
+      return -m_gyro.getYaw();
 
     }
     }
@@ -266,9 +266,7 @@ public class DriveSubsystem extends SubsystemBase {
     }
 
   if (Math.abs(xSpeedDelivered) > .1 || Math.abs(ySpeedDelivered) > .1 || Math.abs(rotDelivered) > .1) {
-    String simStatus = RobotBase.isSimulation() ? " (SIM - 10x turn)" : "";
-    System.out.println(String.format(
-      "Driving - X: %.2f m/s, Y: %.2f m/s, Rot: %.2f rad/s%s", xSpeedDelivered, ySpeedDelivered, rotDelivered, simStatus));}
+        }
 
     var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(
         m_lastChassisSpeeds);

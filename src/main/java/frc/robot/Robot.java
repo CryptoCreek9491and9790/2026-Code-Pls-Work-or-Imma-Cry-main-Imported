@@ -47,7 +47,6 @@ public class Robot extends TimedRobot {
     
     drivetrain = m_robotContainer.getDrivetrain(); // <-- Get the drivetrain
 
-    System.out.println("=== NEW CODE LOADED ===");
 
 
   }
@@ -88,7 +87,7 @@ public class Robot extends TimedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
-    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+    //m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();

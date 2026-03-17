@@ -72,10 +72,10 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     private void setBackRollerRPM(double rpm) {
-        backrollerController.setSetpoint(rpm, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
+        backrollerController.setSetpoint(rpm , ControlType.kVelocity, ClosedLoopSlot.kSlot0);
     }
     private void setShooterRPM(double rpm) {
-        shooterController.setSetpoint(rpm, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
+        shooterController.setSetpoint(rpm , ControlType.kVelocity, ClosedLoopSlot.kSlot0);
     }
     private void stopAll() {
         ShooterMotor.set(0);
@@ -95,14 +95,14 @@ public class ShooterSubsystem extends SubsystemBase {
             //Clamp distance to table bouds so it doesnt extrapolate wildly
             dist = Math.max(1.0, Math.min(5.0, dist));
 
-            double shooterRPM = shooterRPMMap.get(dist);
+            //double shooterRPM = shooterRPMMap.get(dist);
             double backrollerRPM = backrollerRPMMap.get(dist);
 
-            setShooterRPM(shooterRPM);
+            //setShooterRPM(shooterRPM);
             setBackRollerRPM(backrollerRPM);
 
             SmartDashboard.putNumber("Shooter/Distance (m)", dist);
-            SmartDashboard.putNumber("Shooter/Flywheel RPM", shooterRPM);
+            //SmartDashboard.putNumber("Shooter/Flywheel RPM", shooterRPM);
             SmartDashboard.putNumber("Shooter/Backroller RPM", backrollerRPM);
         }).finallyDo(interrupted -> stopAll()).withName("Shoot");
     }
@@ -112,8 +112,8 @@ public class ShooterSubsystem extends SubsystemBase {
     public Command shootFixedCommand() {
         return this.startEnd(
             () -> {
-                setShooterRPM(3500);
-                setBackRollerRPM(2800);
+                setShooterRPM(4000);
+                setBackRollerRPM(5000);
             }, this::stopAll)
             .withName("Shoot Fixed");
     }
