@@ -12,7 +12,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.DriveSubsystem;
 
-
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
  * each mode, as described in the TimedRobot documentation. If you change the name of this class or
@@ -46,11 +45,7 @@ public class Robot extends TimedRobot {
     m_robotContainer = new RobotContainer();  // <-- Create container
     
     drivetrain = m_robotContainer.getDrivetrain(); // <-- Get the drivetrain
-
-
-
   }
-  
 
   /**
    * This function is called every 20 ms, no matter the mode. Use this for items like diagnostics
@@ -87,12 +82,12 @@ public class Robot extends TimedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
-    //m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
     }
-    }
+  }
 
     /*
      * String autoSelected = SmartDashboard.getString("Auto Selector",
@@ -128,15 +123,13 @@ public class Robot extends TimedRobot {
   @Override
   public void testPeriodic() {}
 
-  
-    public void resetPose() {
+  public void resetPose() {
         // Example Only - startPose should be derived from some assumption
         // of where your robot was placed on the field.
         // The first pose in an autonomous path is often a good choice.
         var startPose = new Pose2d(1, 1, new Rotation2d());
         drivetrain.resetOdometry(startPose);
         //visionSim.resetSimPose(startPose);
-
   }
 }
 
